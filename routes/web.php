@@ -1,5 +1,6 @@
 <?php
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -10,7 +11,10 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', "HomeController@index");
+Route::group(['prefix'=>'/'], function(){
+Route::resource('tasks', 'TaskController')->names('tasks');
 });
+
+Auth::routes();
+

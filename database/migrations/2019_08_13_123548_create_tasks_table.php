@@ -21,7 +21,7 @@ class CreateTasksTable extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->text('files')->nullable();
             $table->timestamp('created_at');
-
+            $table->text('ansver')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
 
         });
