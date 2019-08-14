@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Roles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -36,4 +37,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function hasPermission($user){
+        $role  = Roles::findOrFail($user->role_id)->value("role_name");
+        if ($role == "manager") return true;
+        else return false;
+    }
+
 }

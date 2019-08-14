@@ -17,15 +17,15 @@
                 <tr>
                     <th scope="col">{{$item['id']}}
                     </th>
-                    <th scope="col"> <a href="{{route ("tasks.show", $item->id)}}">{{$item['theme']}}</a></th>
+                    <th scope="col"> <a href="{{route ("tasks.edit", $item->id)}}">{{$item['theme']}}</a></th>
                     <th scope="col">{{
                     DB::table('users')->where('id', $item->user_id)->value('name')
                     }}</th>
                     <th scope="col">{{$item['created_at']}}</th>
+
                 </tr>
             @endforeach
             </tbody>
-
         </table>
         @if($paging->total() > $paging->count())
 

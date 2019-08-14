@@ -2,9 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Auth\PermissionController;
+use App\Jobs\SendMailJob;
+use App\Mail\TaskMail;
 use App\Models\Tasks;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class TaskController extends Controller
 {
@@ -15,7 +23,8 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $paging = Tasks::paginate(5);
+//        dd(Auth::user()->hasPermission(auth()->user()));
+        $paging = Tasks::paginate(15);
         return view('tasks.index', compact('paging'));
     }
 
@@ -41,11 +50,17 @@ class TaskController extends Controller
         $data["user_id"] = auth()->id();
         $time = Carbon::now('GMT+3');
         $item = new Tasks($data);
-
-
         $item->save();
+
+        $data['email']=DB::table('users')->where('id',$data['user_id'])->value('email');
+        $data['user_name']=DB::table('users')->where('id',$data['user_id'])->value('name');
+        $data['type'] = "creating";
+
+        dispatch(new SendMailJob($data));
+//        Mail::to($email)->send(new TaskMail($data));
         if($item)
         {
+
             return redirect('tasks')->with(['saved'=>"Запись отправлена"]);
         }
         else{
@@ -61,8 +76,7 @@ class TaskController extends Controller
      */
     public function show($id)
     {
-        $item= Tasks::findOrFail($id);
-        return view('tasks.show', compact("item"));
+        //
     }
 
     /**
@@ -73,7 +87,8 @@ class TaskController extends Controller
      */
     public function edit($id)
     {
-        //
+        $item= Tasks::where('id','=',$id)->first();
+        return view('tasks.edit', compact("item"));
     }
 
     /**
@@ -85,7 +100,16 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $item= Tasks::where('id','=',$id)->first();
+//        dd($request->get('ansver'));
+        $item->ansver = $request->get('ansver');
+        $item->save();
+        $data = $request->all();
+        //dd($data);
+        $data['type'] = "updating";
+
+        dispatch(new SendMailJob($data));
+        return redirect('tasks');
     }
 
     /**
@@ -96,6 +120,8 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $item = Tasks::where('id','=', $id);
+            $item->forceDelete();
+        return redirect('tasks');
     }
 }
