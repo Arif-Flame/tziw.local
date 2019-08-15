@@ -19,11 +19,13 @@
                     </div>
                     <div class="form-group">
                         <label for="user_id">Пользователь:</label>
-                        <input disabled class="form-control" type="text" id="user_id" name="user_id" value="{{DB::table('users')->where('id',auth()->id())->value('name')}}">
+                        <input disabled class="form-control" type="text" id="user_id" name="user_name" value="{{DB::table('users')->where('id',auth()->id())->value('name')}}">
+                        <input hidden class="form-control" type="text" id="user_id" name="user_name" value="{{DB::table('users')->where('id',auth()->id())->value('name')}}">
                     </div>
                     <div class="form-group">
                         <label for="user_email">Почта:</label>
-                        <input disabled class="form-control" type="text" id="user_email" name="user_email" value="{{DB::table('users')->where('id',auth()->id())->value('email')}}">
+                        <input disabled class="form-control" type="text" id="user_email" name="email" value="{{DB::table('users')->where('id',auth()->id())->value('email')}}">
+                        <input hidden class="form-control" type="text" id="email" name="email" value="{{DB::table('users')->where('id',auth()->id())->value('email')}}">
                     </div>
                     <div class="form-group">
                         <label for="files">Прикрепленные файлы:</label>

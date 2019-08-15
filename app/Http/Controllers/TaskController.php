@@ -21,11 +21,22 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function permission()
+    {
+        return Auth::user()->hasPermission(\auth()->id());
+    }
+
+
     public function index()
     {
-//        dd(Auth::user()->hasPermission(auth()->user()));
-        $paging = Tasks::paginate(15);
-        return view('tasks.index', compact('paging'));
+//            dd($this->permission());
+            $permission = $this->permission();
+
+            $paging = Tasks::paginate(15);
+            return view('tasks.index', compact('paging', 'permission'));
+
+
+
     }
 
     /**
@@ -48,14 +59,14 @@ class TaskController extends Controller
     {
         $data = $request->all();
         $data["user_id"] = auth()->id();
-        $time = Carbon::now('GMT+3');
+//        $time = Carbon::now('GMT+3');
         $item = new Tasks($data);
         $item->save();
 
-        $data['email']=DB::table('users')->where('id',$data['user_id'])->value('email');
-        $data['user_name']=DB::table('users')->where('id',$data['user_id'])->value('name');
+//        $data['email']=DB::table('users')->where('id',$data['user_id'])->value('email');
+//        $data['user_name']=DB::table('users')->where('id',$data['user_id'])->value('name');
         $data['type'] = "creating";
-
+        $data['ansver'] = null;
         dispatch(new SendMailJob($data));
 //        Mail::to($email)->send(new TaskMail($data));
         if($item)
@@ -87,8 +98,9 @@ class TaskController extends Controller
      */
     public function edit($id)
     {
+        $permission = $this->permission();
         $item= Tasks::where('id','=',$id)->first();
-        return view('tasks.edit', compact("item"));
+        return view('tasks.edit', compact("item", "permission"));
     }
 
     /**

@@ -17,7 +17,12 @@
                 <tr>
                     <th scope="col">{{$item['id']}}
                     </th>
+                    @if($permission)
                     <th scope="col"> <a href="{{route ("tasks.edit", $item->id)}}">{{$item['theme']}}</a></th>
+
+                    @else
+                        <th scope="col">{{$item['theme']}}</th>
+                    @endif
                     <th scope="col">{{
                     DB::table('users')->where('id', $item->user_id)->value('name')
                     }}</th>

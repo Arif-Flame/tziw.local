@@ -23,14 +23,13 @@ class TaskMail extends Mailable
         $this->user_name =$data['user_name'];
         $this->theme = $data['theme'];
         $this->text = $data['message'];
-        if ($this->type == "updating") {
-            $this->ansver = $data["ansver"];
-        }
+        $this->ansver = $data["ansver"] ;
 
 
 
 
-//        dd($data);
+
+        info($data);
 //        $this->username = $data['user_name'];
     }
 
@@ -41,11 +40,8 @@ class TaskMail extends Mailable
      */
     public function build()
     {
-    if ($this->type == "creating") {
-            $this->view('mails.tasksCreate', ['user_name' => $this->user_name, 'theme' => $this->theme, 'text' => $this->text]);
-        }
-        else{
-                $this->view('mails.tasksCreate', ['theme' => $this->theme, 'ansver' => $this->ansver]);
-        }
+
+            $this->view('mails.tasksCreate', ['type'=>$this->type, 'user_name' => $this->user_name, 'theme' => $this->theme, 'text' => $this->text, 'ansver' => $this->ansver]);
+
     }
 }

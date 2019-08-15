@@ -18,7 +18,14 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if (Auth::guard($guard)->check()) {
-            return redirect('/home');
+
+            if(Auth::user()->hasPermission(auth()->id())){
+                return redirect('/tasks');
+            }
+            else
+            {
+                return redirect('/tasks/create');
+            }
         }
 
         return $next($request);

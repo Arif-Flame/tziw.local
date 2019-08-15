@@ -2,6 +2,7 @@
 
 @section('content')
     @auth
+        @if ($permission)
         <div class="container">
 
             <a href="{{route("tasks.index")}}"><i class="fas fa-chevron-left text-black-50 "> Вернуться назад...</i> </a>
@@ -63,5 +64,8 @@
 
             </form>
         </div>
+            @else
+            <h2>Нарушение прав доступа!</h2>
+            @endif
     @endauth
 @endsection

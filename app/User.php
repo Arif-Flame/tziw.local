@@ -37,10 +37,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    public function hasPermission($user){
-        $role  = Roles::findOrFail($user->role_id)->value("role_name");
+    public function hasPermission($user_id){
+        $role  = Roles::where('id','=',$user_id)->value("role_name");
+//        dd($role);
         if ($role == "manager") return true;
-        else return false;
+        return false;
+
     }
 
 }
