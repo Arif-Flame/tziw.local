@@ -2,7 +2,7 @@
 
 @section('content')
     @auth
-        <form method="POST" action="{{route("tasks.store")}}">
+        <form method="POST" action="{{route('tasks.store')}}" enctype="multipart/form-data">
             <div class="container">
 
 
@@ -29,7 +29,8 @@
                     </div>
                     <div class="form-group">
                         <label for="files">Прикрепленные файлы:</label>
-                        <input type="file" id="files" name="files" class="form-control-file custom-file"></input>
+                        <input type="file" id="files" multiple name="files[]" class="form-control-file custom-file" onchange="checkFileInput()"></input>
+                        <input hidden type="file" id="files_hidden" multiple name="files[]"></input>
                     </div>
                     <div class="form-group">
                         <label for="time">Время создания:</label>
@@ -40,5 +41,16 @@
                 </form>
             </div>
         </form>
+ <script>
+function checkFileInput(){
+    var elem = document.getElementById("files");
+    if(elem.files.length >= 2){
+        // elem.files = Array.prototype.slice.call( elem.files, 0, 15); //Then simply use the slice arguments at your convenience
+        document.getElementById("files_hidden").files = elem.files;
+        console.log(elem.files);
+        elem.setAttribute('disabled', "true");
+    }
+}
+</script>       
     @endauth
 @endsection

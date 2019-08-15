@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Auth\PermissionController;
 use App\Jobs\SendMailJob;
+use App\Jobs\UploadFileJob;
 use App\Mail\TaskMail;
 use App\Models\Tasks;
 use App\User;
@@ -59,16 +60,31 @@ class TaskController extends Controller
     {
         $data = $request->all();
         $data["user_id"] = auth()->id();
+//        dd($data["files"][0]->getClientOriginalName());
+
+//        if(count($data["files"]>15)){
+//            $data["files"] = array_slice($data["files"], 0,15);
+//        }
+
+
+
 //        $time = Carbon::now('GMT+3');
+        $files=$data["files"];
+        $data["files"] = "Hello";
         $item = new Tasks($data);
         $item->save();
 
-//        $data['email']=DB::table('users')->where('id',$data['user_id'])->value('email');
-//        $data['user_name']=DB::table('users')->where('id',$data['user_id'])->value('name');
+        dispatch(new UploadFileJob($files, $item->id));
+
+
+        // Очередь на загрузку файлов!
+
         $data['type'] = "creating";
         $data['ansver'] = null;
+
+        // Очередь на отправку почты!
         dispatch(new SendMailJob($data));
-//        Mail::to($email)->send(new TaskMail($data));
+
         if($item)
         {
 
