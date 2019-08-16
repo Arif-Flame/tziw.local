@@ -12,8 +12,10 @@
 |
 */
 Route::get('/', "HomeController@index");
+Route::get('downloadfile/{id}', "TaskController@downloadFile")->name("downloadFile");
 Route::group(['prefix'=>'/'], function(){
-Route::resource('tasks', 'TaskController')->names('tasks');
+    Route::resource('tasks', 'TaskController')->names('tasks');
+
 });
 
 Auth::routes();

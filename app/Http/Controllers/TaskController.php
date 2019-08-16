@@ -9,11 +9,14 @@ use App\Mail\TaskMail;
 use App\Models\Tasks;
 use App\User;
 use Carbon\Carbon;
+
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
@@ -34,6 +37,7 @@ class TaskController extends Controller
             $permission = $this->permission();
 
             $paging = Tasks::paginate(15);
+
             return view('tasks.index', compact('paging', 'permission'));
 
 
@@ -56,28 +60,33 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    function save_files($files_array, $id){
+        $filenames = array();
+        foreach($files_array as $file){
+            $generated_filename = time().'_'.$file->getClientOriginalName();
+//            $file->move(storage_path('uploads'), $generated_filename);
+//            $file->store('uploads', 'public');
+
+
+//            Storage::disk('public')->put($generated_filename, 'Contents');
+            $file_path = $file->storeAs('public', $generated_filename);
+
+            array_push($filenames, $generated_filename);
+        }
+        Tasks::whereIn('id', [$id])->update(['files'=>implode(';',$filenames)]);
+    }
     public function store(Request $request)
     {
         $data = $request->all();
         $data["user_id"] = auth()->id();
-//        dd($data["files"][0]->getClientOriginalName());
+        $files = $data['files'] ?? null;
 
-//        if(count($data["files"]>15)){
-//            $data["files"] = array_slice($data["files"], 0,15);
-//        }
-
-
-
-//        $time = Carbon::now('GMT+3');
-        $files=$data["files"];
-        $data["files"] = "Hello";
+        $data['files'] = null;
         $item = new Tasks($data);
         $item->save();
 
-        dispatch(new UploadFileJob($files, $item->id));
 
-
-        // Очередь на загрузку файлов!
+        if (isset($files)) $this->save_files($files, $item->id);
 
         $data['type'] = "creating";
         $data['ansver'] = null;
@@ -112,11 +121,21 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function downloadFile($file){
+
+        $url = Storage::url('file1.jpg');
+
+        return Storage::download($url);
+
+
+    }
     public function edit($id)
     {
         $permission = $this->permission();
         $item= Tasks::where('id','=',$id)->first();
-        return view('tasks.edit', compact("item", "permission"));
+        $filenames_array = explode(";", $item->files);
+
+        return view('tasks.edit', compact("item", "permission", "filenames_array"));
     }
 
     /**

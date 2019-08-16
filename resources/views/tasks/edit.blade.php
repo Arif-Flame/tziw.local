@@ -43,7 +43,11 @@
                 </div>
                 <div class="form-group">
                     <label for="files">Прикрепленные файлы:</label>
-                    <span id="files">Тут будут файлы</span>
+                    @foreach($filenames_array as $file)
+                        <a href="{{route("downloadFile", $file)}}" download>{{$file}}</a>
+                    @endforeach
+
+
                 </div>
                 <div class="form-group">
                     <label for="created_time">Время создания:</label>
